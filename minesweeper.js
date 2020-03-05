@@ -1,28 +1,43 @@
 document.addEventListener('DOMContentLoaded', startGame)
 
-var board = {
-  cells: [
-    {row: 0, col: 0, isMine: true, hidden: true},
-    {row: 0, col: 1, isMine: false, hidden: true},
-    {row: 0, col: 2, isMine: false, hidden: true},
-    {row: 1, col: 0, isMine: false, hidden: true},
-    {row: 1, col: 1, isMine: true, hidden: true},
-    {row: 1, col: 2, isMine: false, hidden: true},
-    {row: 2, col: 0, isMine: false, hidden: true},
-    {row: 2, col: 1, isMine: true, hidden: true},
-    {row: 2, col: 2, isMine: false, hidden: true}]
-}
-
 function startGame () {
   document.addEventListener('click', checkForWin)
   document.addEventListener('contextmenu', checkForWin)
+  document.getElementById('reset-button').addEventListener('click', resetBoard)
+
+  generateBoard(5, 5, 5)
+
+  // Don't remove this function call: it makes the game work!
+  lib.initBoard()
+}
+
+function generateBoard (rows, columns, mines) {
+  board = { cells: [] }
+
+  for (var i = 0; i < rows; i++) {
+    for (var j = 0; j < columns; j++) {
+      board.cells.push( {
+        row: i,
+        col: j,
+        isMine: false,
+        hidden: true,
+        isMarked: false,
+      } )
+    }
+  }
+
+  while (mines != 0) {
+    randomCell = Math.floor(Math.random() * (rows * columns))
+
+    if (!board.cells[randomCell].isMine) {
+      board.cells[randomCell].isMine = true
+      mines--
+    }
+  }
 
   for (var i = 0; i < board.cells.length; i++) {
     board.cells[i].surroundingMines = countSurroundingMines(board.cells[i])
   }
-  
-  // Don't remove this function call: it makes the game work!
-  lib.initBoard()
 }
 
 function checkForWin () {
@@ -53,3 +68,12 @@ function countSurroundingMines (cell) {
   return mineCount
 }
 
+//ADD a button and interface
+function resetBoard () {
+  var gameBoard = document.getElementsByClassName('board')[0]
+  gameBoard.innerHTML = ''
+
+  generateBoard(5, 5, 5)
+
+  lib.initBoard()
+}
